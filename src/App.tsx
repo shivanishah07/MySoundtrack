@@ -93,6 +93,19 @@ const VinylRecord = ({ image, size = "large" }: { image?: string, size?: "small"
 
       {/* Minimalist Glossy Reflection Overlay */}
       <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 via-transparent to-black/10 pointer-events-none opacity-40" />
+
+      {/* Minimalist Needle Arm */}
+      <div className="absolute -right-4 -top-4 w-1/2 h-1/2 pointer-events-none z-30 flex items-start justify-end">
+        <motion.div 
+          initial={{ rotate: -25 }}
+          animate={{ rotate: -15 }}
+          transition={{ duration: 4, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+          className="w-full h-0.5 bg-vinyl/30 origin-right rounded-full relative"
+        >
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-1.5 bg-vinyl/40 rounded-sm" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-vinyl/20 rounded-full border border-vinyl/10" />
+        </motion.div>
+      </div>
     </div>
   );
 };
@@ -126,14 +139,20 @@ const Hero = () => {
       </motion.div>
 
       <motion.div 
-        initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
-        whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
         className="flex justify-center lg:justify-end relative"
       >
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-mustard/20 rounded-full blur-3xl" />
         <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-retro-red/10 rounded-full blur-3xl" />
-        <VinylRecord image="https://picsum.photos/seed/jazz/600/600" />
+        <div className="relative z-10 p-12 bg-cream rounded-[3rem] border border-vinyl/5 shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-700">
+          <div className="space-y-6">
+            <div className="w-16 h-1 bg-retro-red rounded-full" />
+            <h3 className="text-4xl font-serif italic leading-tight">"Music is the <br />shorthand of <br />emotion."</h3>
+            <p className="text-xs uppercase tracking-widest opacity-40">— Leo Tolstoy</p>
+          </div>
+        </div>
       </motion.div>
     </section>
   );
@@ -159,14 +178,7 @@ const QuickVibes = () => {
 };
 
 const SoundIdentity = ({ selectedTheme, setSelectedTheme }: { selectedTheme: string, setSelectedTheme: (theme: string) => void }) => {
-  const themes = [
-    { name: 'Nostalgic', color: 'bg-mustard', textColor: 'text-vinyl', font: 'font-serif italic' },
-    { name: 'Funky', color: 'bg-retro-red', textColor: 'text-white', font: 'font-bold uppercase tracking-tighter' },
-    { name: 'Modern', color: 'bg-vinyl', textColor: 'text-background', font: 'font-sans font-light' },
-    { name: 'Minimalist', color: 'bg-cream', textColor: 'text-vinyl', font: 'font-sans font-thin tracking-widest' },
-  ];
-
-  const currentTheme = themes.find(t => t.name === selectedTheme) || themes[2];
+  const currentTheme = THEMES.find(t => t.name === selectedTheme) || THEMES[2];
 
   return (
     <section className="py-24 px-6 max-w-7xl mx-auto">
@@ -198,7 +210,7 @@ const SoundIdentity = ({ selectedTheme, setSelectedTheme }: { selectedTheme: str
             <div className="space-y-4">
               <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-40">Select Your Theme</p>
               <div className="flex flex-wrap gap-3">
-                {themes.map((theme) => (
+                {THEMES.map((theme) => (
                   <button 
                     key={theme.name}
                     onClick={() => setSelectedTheme(theme.name)}
@@ -229,6 +241,47 @@ const SoundIdentity = ({ selectedTheme, setSelectedTheme }: { selectedTheme: str
   );
 };
 
+// --- Constants & Types ---
+
+const THEMES = [
+  { 
+    name: 'Nostalgic', 
+    color: 'bg-navy', 
+    textColor: 'text-white', 
+    font: 'font-serif italic', 
+    accent: 'text-mustard',
+    accentBorder: 'border-mustard',
+    cardBg: 'bg-white/5'
+  },
+  { 
+    name: 'Funky', 
+    color: 'bg-retro-red', 
+    textColor: 'text-white', 
+    font: 'font-bold uppercase tracking-tighter', 
+    accent: 'text-mustard',
+    accentBorder: 'border-mustard',
+    cardBg: 'bg-black/20'
+  },
+  { 
+    name: 'Modern', 
+    color: 'bg-vinyl', 
+    textColor: 'text-background', 
+    font: 'font-sans font-light', 
+    accent: 'text-mustard',
+    accentBorder: 'border-mustard',
+    cardBg: 'bg-white/5'
+  },
+  { 
+    name: 'Minimalist', 
+    color: 'bg-cream', 
+    textColor: 'text-vinyl', 
+    font: 'font-sans font-thin tracking-widest', 
+    accent: 'text-retro-red',
+    accentBorder: 'border-retro-red',
+    cardBg: 'bg-white'
+  },
+];
+
 const MusicSplit = ({ selectedTheme }: { selectedTheme: string }) => {
   const stats = [
     { label: "Top Genre", value: "Neo-Soul" },
@@ -243,12 +296,12 @@ const MusicSplit = ({ selectedTheme }: { selectedTheme: string }) => {
     { title: "SOS", artist: "SZA", img: "https://picsum.photos/seed/sos/400/400" },
   ];
 
-  const accentColor = selectedTheme === 'Funky' ? 'border-mustard' : 'border-retro-red';
+  const theme = THEMES.find(t => t.name === selectedTheme) || THEMES[2];
 
   return (
     <section className="py-24 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-20">
       <div className="space-y-12">
-        <h3 className="text-4xl font-bold uppercase tracking-tighter">The Statistics</h3>
+        <h3 className={`text-4xl font-bold uppercase tracking-tighter ${theme.font}`}>The Statistics</h3>
         <div className="grid grid-cols-2 gap-8">
           {stats.map((stat, i) => (
             <motion.div 
@@ -256,15 +309,15 @@ const MusicSplit = ({ selectedTheme }: { selectedTheme: string }) => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className={`border-l-2 ${accentColor} pl-6 space-y-1`}
+              className={`border-l-2 ${theme.accentBorder} pl-6 space-y-1`}
             >
               <span className="text-[10px] uppercase tracking-[0.3em] text-vinyl/40 font-bold">{stat.label}</span>
-              <p className="text-2xl font-serif italic">{stat.value}</p>
+              <p className={`text-2xl ${theme.font}`}>{stat.value}</p>
             </motion.div>
           ))}
         </div>
-        <div className={`p-8 ${selectedTheme === 'Minimalist' ? 'bg-white' : 'bg-cream'} rounded-3xl space-y-4 border border-vinyl/5`}>
-          <p className="text-sm italic text-vinyl/70">"Your music taste is like a vintage film—grainy, emotional, and timeless."</p>
+        <div className={`p-8 ${theme.cardBg} rounded-3xl space-y-4 border border-vinyl/5`}>
+          <p className={`text-sm italic text-vinyl/70 ${theme.font}`}>"Your music taste is like a vintage film—grainy, emotional, and timeless."</p>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-vinyl flex items-center justify-center">
               <Volume2 className="w-4 h-4 text-background" />
@@ -291,7 +344,7 @@ const MusicSplit = ({ selectedTheme }: { selectedTheme: string }) => {
                 <div className="bg-white p-4 shadow-2xl rounded-lg border border-vinyl/5">
                   <img src={item.img} alt={item.title} className="w-64 h-64 object-cover rounded-sm mb-4" referrerPolicy="no-referrer" />
                   <div className="space-y-1">
-                    <h4 className="font-serif font-bold">{item.title}</h4>
+                    <h4 className={`font-bold ${theme.font}`}>{item.title}</h4>
                     <p className="text-xs uppercase tracking-widest text-vinyl/40">{item.artist}</p>
                   </div>
                 </div>
@@ -305,6 +358,8 @@ const MusicSplit = ({ selectedTheme }: { selectedTheme: string }) => {
 };
 
 const ExperienceGrid = ({ selectedTheme }: { selectedTheme: string }) => {
+  const theme = THEMES.find(t => t.name === selectedTheme) || THEMES[2];
+  
   const cards = [
     { title: "Top Artist", value: "Arctic Monkeys", icon: <Music />, color: selectedTheme === 'Funky' ? "bg-mustard/5" : "bg-retro-red/5" },
     { title: "Most Played", value: "Do I Wanna Know?", icon: <Play />, color: selectedTheme === 'Nostalgic' ? "bg-vinyl/5" : "bg-mustard/5" },
@@ -317,7 +372,7 @@ const ExperienceGrid = ({ selectedTheme }: { selectedTheme: string }) => {
   return (
     <section className="py-24 px-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-end mb-12">
-        <h2 className="text-5xl font-bold tracking-tighter">Music Journey</h2>
+        <h2 className={`text-5xl font-bold tracking-tighter ${theme.font}`}>Music Journey</h2>
         <button className="text-sm font-bold uppercase tracking-widest flex items-center gap-2 hover:text-retro-red transition-colors cursor-pointer">
           View All <ArrowRight className="w-4 h-4" />
         </button>
@@ -335,7 +390,7 @@ const ExperienceGrid = ({ selectedTheme }: { selectedTheme: string }) => {
               </div>
               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-vinyl/30">{card.title}</span>
             </div>
-            <p className="text-3xl font-serif italic leading-tight">{card.value}</p>
+            <p className={`text-3xl leading-tight ${theme.font}`}>{card.value}</p>
           </motion.div>
         ))}
       </div>
@@ -591,14 +646,7 @@ const WrappedPage = ({ selectedTheme }: { selectedTheme: string }) => {
   const [isAnalyzed, setIsAnalyzed] = useState(false);
   const [importService, setImportService] = useState<string | null>(null);
   
-  const themes = [
-    { name: 'Nostalgic', color: 'bg-mustard', textColor: 'text-vinyl', font: 'font-serif italic', accent: 'text-vinyl' },
-    { name: 'Funky', color: 'bg-retro-red', textColor: 'text-white', font: 'font-bold uppercase tracking-tighter', accent: 'text-mustard' },
-    { name: 'Modern', color: 'bg-vinyl', textColor: 'text-background', font: 'font-sans font-light', accent: 'text-mustard' },
-    { name: 'Minimalist', color: 'bg-cream', textColor: 'text-vinyl', font: 'font-sans font-thin tracking-widest', accent: 'text-retro-red' },
-  ];
-
-  const currentTheme = themes.find(t => t.name === selectedTheme) || themes[2];
+  const currentTheme = THEMES.find(t => t.name === selectedTheme) || THEMES[2];
 
   const handleStartAnalysis = () => {
     if (!importService) return;
