@@ -53,24 +53,46 @@ const VinylRecord = ({ image, size = "large" }: { image?: string, size?: "small"
 
   return (
     <div className={`relative ${sizeClasses[size]} group`}>
-      {/* Vinyl Base */}
-      <div className="absolute inset-0 bg-vinyl rounded-full shadow-2xl animate-spin-slow vinyl-grooves border-[10px] border-vinyl/20" />
+      {/* Outer Glow */}
+      <div className="absolute inset-0 bg-vinyl/5 rounded-full blur-2xl group-hover:bg-retro-red/10 transition-colors duration-1000" />
+      
+      {/* Vinyl Base with rotation */}
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-0 bg-vinyl rounded-full shadow-2xl border-[1px] border-white/5 overflow-hidden"
+      >
+        {/* Minimalist Grooves - subtle concentric circles */}
+        <div className="absolute inset-0 opacity-20">
+          {[...Array(12)].map((_, i) => (
+            <div 
+              key={i} 
+              className="absolute inset-0 border border-white/10 rounded-full" 
+              style={{ margin: `${(i + 1) * 4}%` }}
+            />
+          ))}
+        </div>
+        
+        {/* Light Reflection */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-30" />
+      </motion.div>
       
       {/* Center Label */}
-      <div className="absolute inset-[30%] bg-white rounded-full overflow-hidden border-4 border-vinyl/10 z-10">
+      <div className="absolute inset-[32%] bg-white rounded-full overflow-hidden border-[4px] border-vinyl/10 z-10 shadow-inner">
         <img 
           src={image || "https://picsum.photos/seed/album/400/400"} 
           alt="Album Art" 
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
           referrerPolicy="no-referrer"
         />
+        {/* Center Hole */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-4 h-4 bg-background rounded-full shadow-inner" />
+          <div className="w-2 h-2 bg-background rounded-full shadow-inner border border-vinyl/10" />
         </div>
       </div>
 
-      {/* Glossy Overlay */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/10 via-transparent to-white/5 pointer-events-none" />
+      {/* Minimalist Glossy Reflection Overlay */}
+      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 via-transparent to-black/10 pointer-events-none opacity-40" />
     </div>
   );
 };
@@ -136,49 +158,68 @@ const QuickVibes = () => {
   );
 };
 
-const SoundIdentity = () => {
+const SoundIdentity = ({ selectedTheme, setSelectedTheme }: { selectedTheme: string, setSelectedTheme: (theme: string) => void }) => {
+  const themes = [
+    { name: 'Nostalgic', color: 'bg-mustard', textColor: 'text-vinyl', font: 'font-serif italic' },
+    { name: 'Funky', color: 'bg-retro-red', textColor: 'text-white', font: 'font-bold uppercase tracking-tighter' },
+    { name: 'Modern', color: 'bg-vinyl', textColor: 'text-background', font: 'font-sans font-light' },
+    { name: 'Minimalist', color: 'bg-cream', textColor: 'text-vinyl', font: 'font-sans font-thin tracking-widest' },
+  ];
+
+  const currentTheme = themes.find(t => t.name === selectedTheme) || themes[2];
+
   return (
     <section className="py-24 px-6 max-w-7xl mx-auto">
-      <div className="bg-vinyl text-background rounded-[3rem] p-12 md:p-20 overflow-hidden relative">
+      <div className={`${currentTheme.color} ${currentTheme.textColor} rounded-[3rem] p-12 md:p-20 overflow-hidden relative transition-colors duration-700 shadow-2xl`}>
         {/* Background Waveform */}
         <div className="absolute bottom-0 left-0 w-full h-1/2 opacity-20 flex items-end gap-1 px-10">
           {Array.from({ length: 40 }).map((_, i) => (
             <motion.div 
-              key={i}
+              key={`${selectedTheme}-${i}`}
               animate={{ height: [20, 100, 40, 80, 20] }}
               transition={{ duration: 2, repeat: Infinity, delay: i * 0.05 }}
-              className="flex-1 bg-mustard rounded-t-full"
+              className={`flex-1 ${selectedTheme === 'Nostalgic' ? 'bg-vinyl' : 'bg-mustard'} rounded-t-full`}
             />
           ))}
         </div>
 
         <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <h2 className="text-5xl md:text-6xl font-bold leading-tight">
-              My Soundtrack <br />
-              <span className="italic text-mustard font-normal">Aesthetic</span>
-            </h2>
-            <p className="text-background/60 text-lg font-light leading-relaxed max-w-md">
-              A breakdown of your music personality—genres, moods, and listening patterns that shaped your year. You're a "Midnight Melancholist" with a penchant for lo-fi textures.
-            </p>
-            <div className="flex gap-4">
-              {["Lo-fi", "Jazz", "Indie"].map((tag, i) => (
-                <span key={i} className="px-4 py-1 border border-background/20 rounded-full text-xs uppercase tracking-widest">
-                  {tag}
-                </span>
-              ))}
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <h2 className={`text-5xl md:text-6xl font-bold leading-tight ${currentTheme.font}`}>
+                My Soundtrack <br />
+                <span className={selectedTheme === 'Funky' ? 'text-mustard' : 'italic text-mustard font-normal'}>Aesthetic</span>
+              </h2>
+              <p className="opacity-70 text-lg font-light leading-relaxed max-w-md">
+                Customize your year's visual identity. Whether you're feeling the warmth of the past or the sharpness of the future, your music deserves a look that matches its soul.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-40">Select Your Theme</p>
+              <div className="flex flex-wrap gap-3">
+                {themes.map((theme) => (
+                  <button 
+                    key={theme.name}
+                    onClick={() => setSelectedTheme(theme.name)}
+                    className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all border ${
+                      selectedTheme === theme.name 
+                        ? 'bg-white text-vinyl border-white scale-105 shadow-lg' 
+                        : 'border-current opacity-40 hover:opacity-100'
+                    }`}
+                  >
+                    {theme.name}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
           <div className="flex justify-center">
-            <div className="relative w-64 h-64">
-              <motion.div 
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 border-2 border-dashed border-mustard/30 rounded-full"
-              />
-              <div className="absolute inset-4 bg-charcoal rounded-full flex items-center justify-center border border-background/10">
-                <Music className="w-12 h-12 text-mustard" />
+            <div className="relative">
+              <VinylRecord size="medium" />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <Music className={`w-8 h-8 ${selectedTheme === 'Nostalgic' ? 'text-mustard' : 'text-retro-red'} z-20`} />
               </div>
             </div>
           </div>
@@ -188,7 +229,7 @@ const SoundIdentity = () => {
   );
 };
 
-const MusicSplit = () => {
+const MusicSplit = ({ selectedTheme }: { selectedTheme: string }) => {
   const stats = [
     { label: "Top Genre", value: "Neo-Soul" },
     { label: "Most Played", value: "Frank Ocean" },
@@ -202,6 +243,8 @@ const MusicSplit = () => {
     { title: "SOS", artist: "SZA", img: "https://picsum.photos/seed/sos/400/400" },
   ];
 
+  const accentColor = selectedTheme === 'Funky' ? 'border-mustard' : 'border-retro-red';
+
   return (
     <section className="py-24 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-20">
       <div className="space-y-12">
@@ -213,14 +256,14 @@ const MusicSplit = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="border-l-2 border-retro-red pl-6 space-y-1"
+              className={`border-l-2 ${accentColor} pl-6 space-y-1`}
             >
               <span className="text-[10px] uppercase tracking-[0.3em] text-vinyl/40 font-bold">{stat.label}</span>
               <p className="text-2xl font-serif italic">{stat.value}</p>
             </motion.div>
           ))}
         </div>
-        <div className="p-8 bg-cream rounded-3xl space-y-4 border border-vinyl/5">
+        <div className={`p-8 ${selectedTheme === 'Minimalist' ? 'bg-white' : 'bg-cream'} rounded-3xl space-y-4 border border-vinyl/5`}>
           <p className="text-sm italic text-vinyl/70">"Your music taste is like a vintage film—grainy, emotional, and timeless."</p>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-vinyl flex items-center justify-center">
@@ -261,13 +304,13 @@ const MusicSplit = () => {
   );
 };
 
-const ExperienceGrid = () => {
+const ExperienceGrid = ({ selectedTheme }: { selectedTheme: string }) => {
   const cards = [
-    { title: "Top Artist", value: "Arctic Monkeys", icon: <Music />, color: "bg-retro-red/5" },
-    { title: "Most Played", value: "Do I Wanna Know?", icon: <Play />, color: "bg-mustard/5" },
+    { title: "Top Artist", value: "Arctic Monkeys", icon: <Music />, color: selectedTheme === 'Funky' ? "bg-mustard/5" : "bg-retro-red/5" },
+    { title: "Most Played", value: "Do I Wanna Know?", icon: <Play />, color: selectedTheme === 'Nostalgic' ? "bg-vinyl/5" : "bg-mustard/5" },
     { title: "Genre Evolution", value: "Rock → Indie → Jazz", icon: <ChevronRight />, color: "bg-vinyl/5" },
-    { title: "Mood Timeline", value: "Melancholy Winter", icon: <Heart />, color: "bg-retro-red/5" },
-    { title: "Discovery", value: "The Marías", icon: <Plus />, color: "bg-mustard/5" },
+    { title: "Mood Timeline", value: "Melancholy Winter", icon: <Heart />, color: selectedTheme === 'Funky' ? "bg-mustard/5" : "bg-retro-red/5" },
+    { title: "Discovery", value: "The Marías", icon: <Plus />, color: selectedTheme === 'Nostalgic' ? "bg-vinyl/5" : "bg-mustard/5" },
     { title: "Throwback", value: "Fleetwood Mac", icon: <Disc />, color: "bg-vinyl/5" },
   ];
 
@@ -543,11 +586,20 @@ const Footer = () => {
   );
 };
 
-const WrappedPage = () => {
+const WrappedPage = ({ selectedTheme }: { selectedTheme: string }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isAnalyzed, setIsAnalyzed] = useState(false);
   const [importService, setImportService] = useState<string | null>(null);
   
+  const themes = [
+    { name: 'Nostalgic', color: 'bg-mustard', textColor: 'text-vinyl', font: 'font-serif italic', accent: 'text-vinyl' },
+    { name: 'Funky', color: 'bg-retro-red', textColor: 'text-white', font: 'font-bold uppercase tracking-tighter', accent: 'text-mustard' },
+    { name: 'Modern', color: 'bg-vinyl', textColor: 'text-background', font: 'font-sans font-light', accent: 'text-mustard' },
+    { name: 'Minimalist', color: 'bg-cream', textColor: 'text-vinyl', font: 'font-sans font-thin tracking-widest', accent: 'text-retro-red' },
+  ];
+
+  const currentTheme = themes.find(t => t.name === selectedTheme) || themes[2];
+
   const handleStartAnalysis = () => {
     if (!importService) return;
     setIsAnalyzing(true);
@@ -566,16 +618,16 @@ const WrappedPage = () => {
 
   if (isAnalyzing) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
+      <div className={`min-h-screen flex flex-col items-center justify-center ${currentTheme.color} ${currentTheme.textColor} p-6 transition-colors duration-700`}>
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           className="mb-8"
         >
-          <Disc className="w-24 h-24 text-retro-red" />
+          <Disc className={`w-24 h-24 ${selectedTheme === 'Funky' ? 'text-white' : 'text-retro-red'}`} />
         </motion.div>
-        <h2 className="text-3xl font-serif italic mb-2">Analyzing your sound...</h2>
-        <p className="text-vinyl/40 uppercase tracking-widest text-xs">Pressing your {importService} memories into vinyl</p>
+        <h2 className={`text-3xl ${currentTheme.font} mb-2`}>Analyzing your sound...</h2>
+        <p className="opacity-40 uppercase tracking-widest text-xs">Pressing your {importService} memories into vinyl</p>
       </div>
     );
   }
@@ -654,9 +706,9 @@ const WrappedPage = () => {
         <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
           <div className="space-y-4">
             <span className="text-retro-red font-bold uppercase tracking-[0.3em] text-xs">Personalized Experience</span>
-            <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-none">
+            <h1 className={`text-6xl md:text-8xl font-bold tracking-tighter leading-none ${currentTheme.font}`}>
               Your 2025 <br />
-              <span className="italic font-normal text-mustard">Soundtrack.</span>
+              <span className={`italic font-normal ${currentTheme.accent}`}>Soundtrack.</span>
             </h1>
           </div>
           <div className="flex gap-4">
@@ -670,26 +722,26 @@ const WrappedPage = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 mb-24">
-          <div className="lg:col-span-2 bg-vinyl text-background rounded-[3rem] p-12 flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-retro-red/20 rounded-full blur-[100px] -mr-32 -mt-32" />
+          <div className={`${currentTheme.color} ${currentTheme.textColor} rounded-[3rem] p-12 flex flex-col justify-between relative overflow-hidden transition-colors duration-700`}>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[100px] -mr-32 -mt-32" />
             <div className="relative z-10 space-y-8">
-              <h2 className="text-4xl font-serif italic">"The year you discovered your soul in the grooves of neo-soul and indie rock."</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-background/10">
+              <h2 className={`text-4xl ${currentTheme.font}`}>"The year you discovered your soul in the grooves of neo-soul and indie rock."</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-current/10">
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-background/40 mb-1">Total Minutes</p>
+                  <p className="text-[10px] uppercase tracking-widest opacity-40 mb-1">Total Minutes</p>
                   <p className="text-3xl font-bold">48,290</p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-background/40 mb-1">Top Artist</p>
+                  <p className="text-[10px] uppercase tracking-widest opacity-40 mb-1">Top Artist</p>
                   <p className="text-3xl font-bold">Frank Ocean</p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-background/40 mb-1">New Artists</p>
+                  <p className="text-[10px] uppercase tracking-widest opacity-40 mb-1">New Artists</p>
                   <p className="text-3xl font-bold">124</p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-background/40 mb-1">Mood</p>
-                  <p className="text-3xl font-bold italic text-mustard">Ethereal</p>
+                  <p className="text-[10px] uppercase tracking-widest opacity-40 mb-1">Mood</p>
+                  <p className={`text-3xl font-bold italic ${currentTheme.accent}`}>Ethereal</p>
                 </div>
               </div>
             </div>
@@ -705,8 +757,8 @@ const WrappedPage = () => {
           </div>
         </div>
 
-        <MusicSplit />
-        <ExperienceGrid />
+        <MusicSplit selectedTheme={selectedTheme} />
+        <ExperienceGrid selectedTheme={selectedTheme} />
 
         <div className="mt-24 p-12 bg-mustard/10 rounded-[3rem] border border-mustard/20 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="space-y-2 text-center md:text-left">
@@ -722,7 +774,7 @@ const WrappedPage = () => {
   );
 };
 
-const HomePage = () => {
+const HomePage = ({ selectedTheme, setSelectedTheme }: { selectedTheme: string, setSelectedTheme: (theme: string) => void }) => {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -730,16 +782,14 @@ const HomePage = () => {
       exit={{ opacity: 0 }}
     >
       <Hero />
-      <QuickVibes />
-      <SoundIdentity />
-      <MusicSplit />
-      <ExperienceGrid />
+      <SoundIdentity selectedTheme={selectedTheme} setSelectedTheme={setSelectedTheme} />
     </motion.div>
   );
 };
 
 const AppContent = () => {
   const location = useLocation();
+  const [selectedTheme, setSelectedTheme] = useState('Modern');
   
   return (
     <div className="min-h-screen selection:bg-retro-red selection:text-white">
@@ -755,8 +805,8 @@ const AppContent = () => {
             transition={{ duration: 0.3 }}
           >
             <Routes location={location}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/wrapped" element={<WrappedPage />} />
+              <Route path="/" element={<HomePage selectedTheme={selectedTheme} setSelectedTheme={setSelectedTheme} />} />
+              <Route path="/wrapped" element={<WrappedPage selectedTheme={selectedTheme} />} />
             </Routes>
           </motion.div>
         </AnimatePresence>
